@@ -1,19 +1,20 @@
-import './globals.css'
-import SessionProvider from './SessionProvider';
-
+import Navbar from "@/components/layouts/navbar";
+import "./globals.css";
+import SessionProvider from "./SessionProvider";
 
 export default async function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full bg-gray-900">
-      <body className="h-full">
-      <SessionProvider>
-        {children}
-      </SessionProvider>
+    <html lang="en" className="h-full">
+      <body className="h-full flex">
+        <SessionProvider>
+          <Navbar />
+          <div>{children}</div>
+        </SessionProvider>
       </body>
     </html>
-  )
+  );
 }
