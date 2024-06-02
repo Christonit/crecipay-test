@@ -35,6 +35,18 @@ export function AddPayment() {
     new Date().getFullYear() + 1,
     new Date().getFullYear() + 2,
   ];
+
+  const fetchClientSecret = () => {
+    // Create a Checkout Session
+    return fetch("/api/checkout_sessions", {
+      method: "POST",
+    }).then((res: any) => {
+      console.log(1, res);
+      console.log(2, res.json());
+    });
+    //   .then((data) => data.clientSecret);
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -68,7 +80,7 @@ export function AddPayment() {
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit">Submit contribution</Button>
+          <Button onClick={fetchClientSecret}>Submit contribution</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -1,5 +1,5 @@
 "use client";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import db from "./firestore";
@@ -7,34 +7,12 @@ import { auth } from "./firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { TypographyH1 } from "../components/ui/typography";
-
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { AddPayment } from "../components/modals/add-contribution";
-import { Button } from "../components/ui/button";
-interface ContributionI {
-  amount: number;
-  contribution_year: number;
-  funding_source: string;
-  status: string;
-  submission_date: {
-    seconds: number;
-    nanoseconds: number;
-  };
-  user: string;
-}
-
+import { ContributionI } from "../lib/types";
+import ContributionsTable from "../components/ContributionsTable";
 export default function Home() {
   const [userId, setUserId] = useState<string>("");
   const [contributions, setContributions] = useState<ContributionI[]>([]);
-  const [showAddContribution, toggleAddContributionModal] = useState(false);
   const session = useSession({
     required: true,
     onUnauthenticated() {
@@ -82,33 +60,9 @@ export default function Home() {
       <hr />
 
       <AddPayment />
-
       <hr />
 
-      <Table>
-        <TableHeader className="w-full">
-          <TableCell>Amount</TableCell>
-          <TableCell>Submission Date</TableCell>
-          <TableCell>Funding Source</TableCell>
-          <TableCell>Status</TableCell>
-          <TableCell>Contribution Year</TableCell>
-        </TableHeader>
-        <TableBody>
-          {contributions.map((contribution, index) => (
-            <TableRow key={index}>
-              <TableCell className="max-w-[200px]">
-                ${contribution.amount}
-              </TableCell>
-              <TableCell>
-                {contribution.submission_date.toLocaleString()}
-              </TableCell>
-              <TableCell>{contribution.funding_source}</TableCell>
-              <TableCell>{contribution.status}</TableCell>
-              <TableCell>{contribution.contribution_year}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <ContributionsTable contributions={contributions} />
     </>
   );
 }
