@@ -1,11 +1,9 @@
 "use client";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "../ui/navigation-menu";
 import { signOut } from "next-auth/react";
@@ -33,6 +31,7 @@ const navLinks: { title: string; href: string }[] = [
     href: "/#",
   },
 ];
+
 export default function Navbar() {
   return (
     <aside className="w-[300px] bg-slate-300 h-[100vh] py-[24px] px-[16px]">
