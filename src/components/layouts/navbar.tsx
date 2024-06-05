@@ -62,11 +62,15 @@ export default function Navbar() {
     <>
       <aside className="w-[300px] bg-slate-200 h-[100vh] py-[24px] border-r-[2px] border-slate-300 ">
         <div className="flex items-center gap-[12px] mb-[64px] px-[16px]">
-          <span className="w-[64px] h-[64px] bg-slate-500 rounded-[12px]"></span>
+          <span className="min-w-[64px] w-[64px] block h-[64px] bg-slate-500 rounded-[12px]"></span>
 
           <div className="flex flex-col">
             <span className="text-lg text-slate-900">Boricua Capital</span>
-            <span className="text-base text-slate-500">{user!.email}</span>
+            <span className="text-base text-slate-500">
+              {user!.email.length > 20
+                ? user!.email.slice(0, 20) + "..."
+                : user!.email}
+            </span>
           </div>
         </div>
         <NavigationMenu orientation="vertical" className="sidebar-nav">
