@@ -34,5 +34,19 @@ export const authOptions = {
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }: any) {
+      if (user) {
+        token.uid = user.uid;
+        token.email = user.email;
+      }
+      return token;
+    },
+    async session({ session, token }: any) {
+      session.user.uid = token.uid;
+      session.user.email = token.email;
+      return session;
+    },
+  },
 };
 export default NextAuth(authOptions);

@@ -2,6 +2,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/app/firebase";
+import { useSession } from "next-auth/react";
 interface GlobalContextType {
   message: string | null;
   messageType: string;
@@ -19,7 +20,7 @@ export const GlobalProvider: React.FC<{
 }> = ({ children }) => {
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<string>("");
-
+  const session = useSession();
   const [user, setUser] = useState<{ uid: string; email: string }>({
     uid: "",
     email: "",
@@ -47,21 +48,11 @@ export const GlobalProvider: React.FC<{
   };
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      console.log(1, user, auth);
-
-      if (user) {
-        const uid = user.uid;
-        console.log("User is signed in.", auth);
-        setUser({
-          uid: uid,
-          email: user.email || "",
-        });
-      } else {
-        console.log("No user is signed in.");
-      }
-    });
-  }, []);
+    if (!session || session.status === "unauthenticated") return;
+    if (session.data) {
+      setUser(session.data.user as { uid: string; email: string });
+    }
+  }, [session]);
 
   const payload = { message, messageType, updateMessage, clearMessage, user };
   return (

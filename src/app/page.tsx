@@ -16,7 +16,7 @@ export default function Home() {
   const [contributions, setContributions] = useState<ContributionI[]>([]);
   const { user } = useContext(GlobalContext) || {};
   const [total, setTotal] = useState(0);
-
+  const [doneLoading, setDoneLoading] = useState(false);
   useSession({
     required: true,
     onUnauthenticated() {
@@ -29,6 +29,8 @@ export default function Home() {
       collection(db, "contributions"),
       where("user", "==", userId)
     );
+
+    setDoneLoading(true);
     const res = await getDocs(q);
     const data = res.docs.map((doc) => doc.data());
 
@@ -89,9 +91,17 @@ export default function Home() {
 
       <Divider />
 
-      <div className="w-full block max-w-[90%] mx-auto">
-        <ContributionsTable contributions={contributions} />
-      </div>
+      {doneLoading && (
+        <div className="w-full block max-w-[90%] mx-auto">
+          {contributions.length > 0 ? (
+            <ContributionsTable contributions={contributions} />
+          ) : (
+            <div className="text-center text-lg text-slate-900 p-[64px] border border-slate-300 rounded-[12px] mt-[32px]">
+              No contributions yet
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 }
