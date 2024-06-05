@@ -6,14 +6,13 @@ export default async function handler(req, res) {
         case "POST":
             try {
                 const { amount } = req.body;
+                if (!amount || amount < 0) return res.status(400).json({ message: "Invalid amount.  It has to be more than 0" });
+                if (amount > 5000) return res.status(400).json({ message: "Amount too high, max is 5000" });
 
-
-                // Create Checkout Sessions from body params.
                 const paymentIntent = await stripe.paymentIntents.create({
                     amount: Number(amount + "00"),
                     currency: "usd",
                     payment_method_types: ["us_bank_account"],
-
 
                 });
 
@@ -22,7 +21,7 @@ export default async function handler(req, res) {
                 });
             } catch (err) {
                 console.log(err);
-                res.status(err.statusCode || 500).json(err.message);
+                res.status(err.statusCode || 500).json({ message: err.message, });
             }
             break;
         case "GET":

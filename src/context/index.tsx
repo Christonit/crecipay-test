@@ -1,14 +1,13 @@
 "use client";
 import React, { createContext, useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import db from "@/app/firestore";
 import { auth } from "@/app/firebase";
 interface GlobalContextType {
   message: string | null;
   messageType: string;
   updateMessage: (newMessage: string, newMessageType: string) => void;
   clearMessage: () => void;
-  user: { uid: string; email: string } | undefined;
+  user: { uid: string; email: string };
 }
 
 export const GlobalContext = createContext<GlobalContextType | undefined>(
@@ -21,10 +20,10 @@ export const GlobalProvider: React.FC<{
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<string>("");
 
-  const [user, setUser] = useState<{
-    uid: string;
-    email: string;
-  }>();
+  const [user, setUser] = useState<{ uid: string; email: string }>({
+    uid: "",
+    email: "",
+  });
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -49,9 +48,11 @@ export const GlobalProvider: React.FC<{
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
+      console.log(1, user, auth);
+
       if (user) {
         const uid = user.uid;
-        console.log("User is signed in.", uid);
+        console.log("User is signed in.", auth);
         setUser({
           uid: uid,
           email: user.email || "",
@@ -62,11 +63,8 @@ export const GlobalProvider: React.FC<{
     });
   }, []);
 
+  const payload = { message, messageType, updateMessage, clearMessage, user };
   return (
-    <GlobalContext.Provider
-      value={{ message, messageType, updateMessage, clearMessage, user }}
-    >
-      {children}
-    </GlobalContext.Provider>
+    <GlobalContext.Provider value={payload}>{children}</GlobalContext.Provider>
   );
 };

@@ -3,23 +3,19 @@ import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import db from "./firestore";
-import { auth } from "./firebase";
-import { collection, getDocs, query, where, addDoc } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { TypographyH1 } from "../components/ui/typography";
 import { AddPayment } from "../components/modals/add-contribution";
 import { ContributionI } from "../lib/types";
 import ContributionsTable from "../components/ContributionsTable";
 import { GlobalContext } from "@/context";
-import {
-  PaymentElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
+import Divider from "@/components/layouts/divider";
+import { parseDate } from "@/lib/utils";
 
 export default function Home() {
   const [contributions, setContributions] = useState<ContributionI[]>([]);
-  const { user } = useContext(GlobalContext);
+  const { user } = useContext(GlobalContext) || {};
+  const [total, setTotal] = useState(0);
 
   useSession({
     required: true,
@@ -44,22 +40,58 @@ export default function Home() {
     fetchContributions(user.uid);
   }, [user]);
 
+  useEffect(() => {
+    if (!contributions) return;
+
+    let total = 0;
+    contributions.forEach((contribution) => {
+      total += contribution.amount;
+    });
+
+    setTotal(total);
+  }, [contributions]);
+
+  useEffect(() => {
+    document.title = "Contributions";
+  }, []);
   return (
     <>
-      <div className="flex flex-col gap-[12px]">
+      <div className="flex flex-col gap-[4px] py-[16px]">
         <TypographyH1>Contributions</TypographyH1>
 
-        <div className="flex gap-[12px]">
-          <span> Current balance: $1,100.00 (last updated 04/24/2024)</span>
+        <div className="flex gap-[12px] text-slate-900 text-base">
+          <span>
+            Current balance:
+            {(total / 100).toLocaleString("en-US", {
+              style: "currency",
+              currency: "USD",
+            })}
+            &nbsp;
+            {contributions.length > 0 && (
+              <>
+                (last updated{" "}
+                {parseDate(
+                  contributions[0].submission_date.toLocaleString(),
+                  "MM/dd/yyyy"
+                )}
+                )
+              </>
+            )}
+          </span>
         </div>
       </div>
 
-      <hr />
+      <Divider />
 
-      <AddPayment />
-      <hr />
+      <div className="py-[16px]">
+        <AddPayment />
+      </div>
 
-      <ContributionsTable contributions={contributions} />
+      <Divider />
+
+      <div className="w-full block max-w-[90%] mx-auto">
+        <ContributionsTable contributions={contributions} />
+      </div>
     </>
   );
 }

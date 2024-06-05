@@ -13,6 +13,7 @@ export const authOptions = {
       name: "Credentials",
       credentials: {},
       async authorize(credentials): Promise<any> {
+        console.log({ credentials });
         return await signInWithEmailAndPassword(
           auth,
           (credentials as any).email || "",
@@ -24,7 +25,6 @@ export const authOptions = {
             }
             return null;
           })
-          .catch((error) => console.log("HOLA MUNDO", error))
           .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
